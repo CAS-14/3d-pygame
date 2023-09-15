@@ -49,9 +49,12 @@ def rotate_matrix(axis: str, radians: int):
     return matrix
 
 class Wireframe:
-    def __init__(self):
+    def __init__(self, nodes: list = None, edges: list = None):
         self.nodes = numpy.zeros((0, 4))
         self.edges = []
+
+        if nodes: self.add_nodes(nodes)
+        if edges: self.add_edges(edges)
 
     def add_nodes(self, nodes: list):
         ones_column = numpy.ones((len(nodes), 1))
@@ -176,7 +179,8 @@ def load_obj(path: str):
                     wireframe.add_edges(edges)
                     edges.clear()
 
-            coords = (int(arg) for arg in command[1:4])
+            coords = tuple([float(arg) for arg in command[1:4]])
+            print(f"Coords: {coords}")
             nodes.append(coords)
             last_v = True
 
@@ -186,25 +190,36 @@ def load_obj(path: str):
                 nodes.clear()
                 last_v = False
 
-            face_nodes = (int(arg) for arg in command[1:])
+            face_node_indices = tuple([int(arg) for arg in command[1:]])
 
             pairs_done = []
-            cont = False
-            for i in face_nodes:
-                for j in face_nodes:
+            skip = False
+            for i in face_node_indices:
+                ii = i-1
+                for j in face_node_indices:
+                    ji = j-1
                     for pair in pairs_done:
-                        if i in pair and j in pair:
-                            cont = True
+                        if ii in pair and ji in pair:
+                            skip = True
 
-                    if cont:
-                        cont = False
+                    if skip:
+                        skip = False
                         continue
 
-                    edge = [i, j]
-                    edges.append(edge)
-                    pairs_done.append(edge)
-                    if balls:
-                        print(edge)
+                    edge = [ii, ji]
+                    
+                    if ii < len(wireframe.nodes):
+                        if ji < len(wireframe.nodes):
+                            edges.append(edge)
+                            pairs_done.append(edge)
+                            if balls:
+                                print(edge)
+
+                        else:
+                            print(f"Skipped invalid edge ({ii}, {ji}) [invalid indice {ji}]")
+
+                    else:
+                        print(f"Skipped invalid edge ({ii}, {ji}) [invalid indice {ii}]")
 
             if balls:
                 balls = False
