@@ -8,10 +8,9 @@ def initial(viewer: projection.ProjectionViewer):
     viewer.rotate_all("x", -3)
 
 viewer = projection.ProjectionViewer()
-viewer.add_wireframe(wireframe.load_obj("teapot.obj"), "teapot", scale=85)
+viewer.add_wireframe(wireframe.load_obj("teapot.obj", scale=85), "teapot")
 viewer.show_nodes = False
 
-
-
+#initial(viewer)
 
 viewer.run()
