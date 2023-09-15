@@ -159,9 +159,6 @@ def load_obj(path: str):
     
     wireframe = Wireframe()
 
-    last_v = False
-    start = True
-    balls = True
     nodes = []
     edges = []
 
@@ -172,27 +169,14 @@ def load_obj(path: str):
             continue
 
         if command[0] == "v":
-            if not last_v:
-                if start:
-                    start = False
-                else:
-                    wireframe.add_edges(edges)
-                    edges.clear()
-
             coords = tuple([float(arg) for arg in command[1:4]])
             print(f"Coords: {coords}")
             nodes.append(coords)
-            last_v = True
 
         elif command[0] == "f":
-            if last_v:
-                wireframe.add_nodes(numpy.array(nodes))
-                nodes.clear()
-                last_v = False
-
             face_node_indices = tuple([int(arg) for arg in command[1:]])
 
-            pairs_done = []
+            pairs_done = [] # may need to make this persist between iterations
             skip = False
             for i in face_node_indices:
                 ii = i-1
@@ -208,21 +192,19 @@ def load_obj(path: str):
 
                     edge = [ii, ji]
                     
-                    if ii < len(wireframe.nodes):
-                        if ji < len(wireframe.nodes):
+                    if ii < len(nodes):
+                        if ji < len(nodes):
                             edges.append(edge)
                             pairs_done.append(edge)
-                            if balls:
-                                print(edge)
 
                         else:
                             print(f"Skipped invalid edge ({ii}, {ji}) [invalid indice {ji}]")
 
                     else:
+                        pass
                         print(f"Skipped invalid edge ({ii}, {ji}) [invalid indice {ii}]")
-
-            if balls:
-                balls = False
                     
+    wireframe.add_nodes(numpy.array(nodes))
+    wireframe.add_edges(edges)
 
     return wireframe
