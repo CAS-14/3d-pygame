@@ -153,7 +153,7 @@ class Wireframe:
     def transform(self, matrix: numpy.matrix):
         self.nodes = numpy.dot(self.nodes, matrix)
 
-def load_obj(path: str, scale: float = 1):
+def load_obj(path: str, scale: float = 1, pos: tuple = (0, 0, 0)):
     with open(path, "r") as f:
         obj = f.read()
     
@@ -169,7 +169,7 @@ def load_obj(path: str, scale: float = 1):
             continue
 
         if command[0] == "v":
-            coords = tuple([float(arg) * scale for arg in command[1:4]])
+            coords = tuple([float(command[i]) * scale + pos[i-1] for i in range(1,4)])
             nodes.append(coords)
 
         elif command[0] == "f":
